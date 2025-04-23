@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT-Based Real-Time Weather Monitoring and Reporting System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: url('https://niituniversity.in/wp-content/uploads/2022/06/Learn-more-About.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Auth Page Styles */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .auth-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-box h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .auth-btn:hover {
+            background: #2980b9;
+        }
+
+        .secondary-btn {
+            background: #2ecc71;
+        }
+
+        .secondary-btn:hover {
+            background: #27ae60;
+        }
+
+        .tertiary-btn {
+            background: #f39c12;
+        }
+
+        .tertiary-btn:hover {
+            background: #e67e22;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .success-message {
+            color: #2ecc71;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-footer a {
+            color: #3498db;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .logout-btn {
+            padding: 8px 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .dashboard-content {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+           
+            .user-info {
+                margin-top: 15px;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Pages -->
+    <div class="auth-container" id="authContainer">
+        <!-- Login Page -->
+        <div class="auth-box" id="loginBox">
+            <h1>IoT-Based Real-Time Weather Monitoring System</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="auth-btn">Login</button>
+                <div id="loginErrorMessage" class="error-message"></div>
+                <div class="auth-footer">
+                    <a id="showRegister">Create an account</a> | 
+                    <a id="showForgotPassword">Forgot password?</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Registration Page -->
+        <div class="auth-box" id="registerBox" style="display: none;">
+            <h1>Create Account</h1>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regName">Full Name</label>
+                    <input type="text" id="regName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <input type="text" id="regUsername" placeholder="Choose a username" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" placeholder="Create a password" required>
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">Confirm Password</label>
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit" class="auth-btn secondary-btn">Register</button>
+                <div id="registerErrorMessage" class="error-message"></div>
+                <div id="registerSuccessMessage" class="success-message"></div>
+                <div class="auth-footer">
+                    Already have an account? <a id="showLogin">Login here</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Forgot Password Page -->
+        <div class="auth-box" id="forgotPasswordBox" style="display: none;">
+            <h1>Reset Password</h1>
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="resetEmail">Email</label>
+                    <input type="email" id="resetEmail" placeholder="Enter your registered email" required>
+                </div>
+                <button type="submit" class="auth-btn tertiary-btn">Send Reset Link</button>
+                <div id="resetErrorMessage" class="error-message"></div>
+                <div id="resetSuccessMessage" class="success-message"></div>
+                <div class="auth-footer">
+                    Remember your password? <a id="showLoginFromForgot">Login here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="container dashboard" id="dashboard">
+        <header>
+            <div>
+                <h1>IoT-Based Real-Time Weather Monitoring and Reporting System</h1>
+                <p>Real-time Weather Data</p>
+            </div>
+            <div class="user-info">
+                <img src="https://via.placeholder.com/40" alt="User">
+                <span id="loggedInUser">Admin</span>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </header>
+
+        
+            <div class="charts-grid">
+                <!-- Row 1 -->
+                <div class="chart-container">
+                    <h3>Temperature</h3>
+                    <iframe width="100%" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2920653/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+                </div>
+                <div class="chart-container">
+                    <h3>Humidity</h3>
+                    <iframe width="100%" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2920653/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+                </div>
+                
+                <!-- Row 2 -->
+                <div class="chart-container">
+                    <h3>Pressure</h3>
+                    <iframe width="100%" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2920653/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+                </div>
+                <div class="chart-container">
+                    <h3>Air</h3>
+                    <iframe width="100%" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2920653/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+                </div>
+                
+                <!-- Row 3 -->
+                <div class="chart-container">
+                    <h3>Hall</h3>
+                    <iframe width="100%" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2920653/charts/5?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+                </div>
+                <div class="chart-container">
+                    <h3>Wind Speed</h3>
+                    <iframe width="100%" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2920653/charts/6?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // User data storage (in a real app, this would be server-side)
+        let users = [
+            { username: "sonu", password: "weather123", name: "SONU KUMAR", email: "sonu@example.com" },
+            { username: "Team12", password: "54321", name: "Weather User", email: "team12@example.com" }
+        ];
+
+        // DOM Elements
+        const authContainer = document.getElementById('authContainer');
+        const loginBox = document.getElementById('loginBox');
+        const registerBox = document.getElementById('registerBox');
+        const forgotPasswordBox = document.getElementById('forgotPasswordBox');
+        const dashboard = document.getElementById('dashboard');
+        
+        // Form elements
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        
+        // Message elements
+        const loginErrorMessage = document.getElementById('loginErrorMessage');
+        const registerErrorMessage = document.getElementById('registerErrorMessage');
+        const registerSuccessMessage = document.getElementById('registerSuccessMessage');
+        const resetErrorMessage = document.getElementById('resetErrorMessage');
+        const resetSuccessMessage = document.getElementById('resetSuccessMessage');
+        
+        // Navigation links
+        document.getElementById('showRegister').addEventListener('click', showRegister);
+        document.getElementById('showLogin').addEventListener('click', showLogin);
+        document.getElementById('showLoginFromForgot').addEventListener('click', showLogin);
+        document.getElementById('showForgotPassword').addEventListener('click', showForgotPassword);
+
+        // Show registration form
+        function showRegister() {
+            loginBox.style.display = 'none';
+            forgotPasswordBox.style.display = 'none';
+            registerBox.style.display = 'block';
+            clearMessages();
+        }
+
+        // Show login form
+        function showLogin() {
+            registerBox.style.display = 'none';
+            forgotPasswordBox.style.display = 'none';
+            loginBox.style.display = 'block';
+            clearMessages();
+        }
+
+        // Show forgot password form
+        function showForgotPassword() {
+            loginBox.style.display = 'none';
+            registerBox.style.display = 'none';
+            forgotPasswordBox.style.display = 'block';
+            clearMessages();
+        }
+
+        // Clear all message displays
+        function clearMessages() {
+            loginErrorMessage.textContent = '';
+            registerErrorMessage.textContent = '';
+            registerSuccessMessage.textContent = '';
+            resetErrorMessage.textContent = '';
+            resetSuccessMessage.textContent = '';
+        }
+
+        // Login functionality
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+           
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+           
+            const user = users.find(u => u.username === username && u.password === password);
+           
+            if (user) {
+                // Successful login - show dashboard
+                authContainer.style.display = 'none';
+                dashboard.style.display = 'block';
+                document.getElementById('loggedInUser').textContent = user.name;
+            } else {
+                loginErrorMessage.textContent = "Invalid username or password";
+            }
+        });
+
+        // Registration functionality
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('regName').value;
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            // Validation
+            if (password !== confirmPassword) {
+                registerErrorMessage.textContent = "Passwords do not match";
+                return;
+            }
+            
+            if (users.some(u => u.username === username)) {
+                registerErrorMessage.textContent = "Username already exists";
+                return;
+            }
+            
+            if (users.some(u => u.email === email)) {
+                registerErrorMessage.textContent = "Email already registered";
+                return;
+            }
+            
+            // Add new user
+            users.push({
+                username,
+                password,
+                name,
+                email
+            });
+            
+            // Show success message
+            registerErrorMessage.textContent = '';
+            registerSuccessMessage.textContent = "Registration successful! You can now login.";
+            
+            // Clear form
+            registerForm.reset();
+            
+            // Show login form after short delay
+            setTimeout(showLogin, 2000);
+        });
+
+        // Forgot password functionality
+        forgotPasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('resetEmail').value;
+            
+            // Check if email exists
+            const user = users.find(u => u.email === email);
+            
+            if (user) {
+                // In a real app, you would send a password reset email here
+                resetErrorMessage.textContent = '';
+                resetSuccessMessage.textContent = `Password reset link sent to ${email} (simulated)`;
+                forgotPasswordForm.reset();
+            } else {
+                resetErrorMessage.textContent = "No account found with that email";
+                resetSuccessMessage.textContent = '';
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            authContainer.style.display = 'flex';
+            dashboard.style.display = 'none';
+            loginForm.reset();
+            showLogin();
+        });
+    </script>
+</body>
+</html>
